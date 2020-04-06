@@ -34,7 +34,7 @@ control 'cis-dil-benchmark-1.6.1.1' do
   end
 
   describe.one do
-    %w(/boot/grub/grub.conf /boot/grub/grub.cfg /boot/grub/menu.lst /boot/boot/grub/grub.conf /boot/boot/grub/grub.cfg /boot/boot/grub/menu.lst).each do |f|
+    grub_conf.locations.each do |f|
       describe file(f) do
         its(:content) { should_not match(/selinux=0/) }
         its(:content) { should_not match(/enforcing=0/) }
@@ -151,7 +151,7 @@ control 'cis-dil-benchmark-1.6.1.6' do
     )
   end
 
-  processes(/.*/).where { pid.positive? }.entries.each do |p|
+  processes(/.*/).where { pid > 0 }.entries.each do |p|
     describe p.label.to_s.split(':')[2] do
       it { should_not cmp 'initrc_t' }
     end
@@ -169,7 +169,7 @@ control 'cis-dil-benchmark-1.6.2.1' do
   only_if { cis_level == 2 && package('apparmor').installed? }
 
   describe.one do
-    %w(/boot/grub/grub.conf /boot/grub/grub.cfg /boot/grub/menu.lst /boot/boot/grub/grub.conf /boot/boot/grub/grub.cfg /boot/boot/grub/menu.lst).each do |f|
+    grub_conf.locations.each do |f|
       describe file(f) do
         its(:content) { should_not match(/apparmor=0/) }
       end
@@ -188,7 +188,7 @@ control 'cis-dil-benchmark-1.6.2.2' do
   only_if { cis_level == 2 && package('apparmor').installed? }
 
   describe command('apparmor_status --profiled') do
-    its(:stdout) { should cmp.positive? }
+    its(:stdout) { should cmp > 0 }
   end
 
   describe command('apparmor_status --complaining') do
